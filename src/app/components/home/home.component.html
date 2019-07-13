@@ -1,0 +1,83 @@
+<div class="container" (drag)="drag($event)" (dragenter)="dragenter($event)">
+    <!--<mat-toolbar class="app-region-drag" color="accent">-->
+        <!--<mat-toolbar-row>-->
+            <!--<span>Third Line</span>-->
+            <!--<span class="spacer"></span>-->
+            <!--<button mat-icon-button>-->
+                <!--<mat-icon aria-label="maximize">maximize</mat-icon>-->
+            <!--</button>-->
+            <!--<button mat-icon-button>-->
+                <!--<mat-icon aria-label="minimize">minimize</mat-icon>-->
+            <!--</button>-->
+            <!--<button mat-icon-button>-->
+                <!--<mat-icon aria-label="Exit">clear</mat-icon>-->
+            <!--</button>-->
+        <!--</mat-toolbar-row>-->
+    <!--</mat-toolbar>-->
+  <div class="system-bar">
+    <div class="left">
+        PDF 转 JPG
+    </div>
+    <div class="right system-bar-buttons">
+        <button (click)="min()" mat-button>_</button>
+        <button (click)="max()" *ngIf="isMax" mat-button><span style="vertical-align: 5px;">❐</span></button>
+        <button (click)="max()" *ngIf="!isMax" mat-button>☐</button>
+        <button (click)="exit()" mat-button color="warn">✕</button>
+    </div>
+  </div>
+  <div class="top">
+
+    <div class="top-in">
+      <mat-button-toggle (click)="addFiles()">
+        选择文件
+      </mat-button-toggle>
+      <mat-form-field appearance="outline">
+        <mat-label>DPI</mat-label>
+        <input [(ngModel)]="dpi" type="number" matInput placeholder="DPI">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>图片质量</mat-label>
+        <input [(ngModel)]="quality" [min]="1" type="number" matInput placeholder="图片质量">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>线程 {{execSet.size ? execSet.size : ''}}</mat-label>
+        <input [(ngModel)]="concurrency" [min]="1" (ngModelChange)="concurrencyChange($event)" type="number" matInput placeholder="线程">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="targetDir" (click)="setTargetDir()">
+        <mat-label>输出目录</mat-label>
+        <input [(ngModel)]="targetDir" readonly matInput placeholder="输出目录">
+      </mat-form-field>
+
+      <mat-button-toggle [disabled]="execSet.size != 0" *ngIf="!queue" (click)="start()">
+        开始转换
+      </mat-button-toggle>
+    <mat-button-toggle *ngIf="queue" (click)="stop()">
+        停止
+    </mat-button-toggle>
+    </div>
+
+  </div>
+  <div class="task-progress">
+    <ng-container *ngFor="let file of fileList">
+      <div *ngFor="let p of file.progress" class="task-progress-item" [class.complete]="p.complete" ></div>
+    </ng-container>
+  </div>
+  <div class="list" #list>
+    <mat-list>
+      <div class="list-progress" *ngFor="let file of fileList">
+        <mat-list-item style="position: relative;" (click)="show()" >
+          <mat-icon mat-list-icon>{{['remove', 'repeat', 'check'][file.status]}}</mat-icon>
+          <h3 matLine> <span>{{file.name}}</span> <span style="float: right;"> 共{{file.pages}}页 </span></h3>
+        </mat-list-item>
+        <div class="task-progress task-progress-absolute">
+          <div *ngFor="let p of file.progress" class="task-progress-item" [class.complete]="p.complete" ></div>
+        </div>
+      </div>
+
+    </mat-list>
+  </div>
+
+</div>

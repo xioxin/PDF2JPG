@@ -1,0 +1,48 @@
+{
+  "productName": "pdf2jpg",
+  "directories": {
+    "output": "release/"
+  },
+  "appId": "pro.wudao.tools.pdf2jpg",
+  "files": [
+        "**/*",
+        "!**/*.ts",
+        "!*.code-workspace",
+        "!LICENSE.md",
+        "!package.json",
+        "!package-lock.json",
+        "!src/",
+        "!e2e/",
+        "!hooks/",
+        "!angular.json",
+        "!_config.yml",
+        "!karma.conf.js",
+        "!tsconfig.json",
+        "!tslint.json"
+    ],
+  "win": {
+    "icon": "dist",
+    "target": [
+      "portable"
+    ],
+    "extraResources": [
+      {
+        "from": "src/bin",
+        "to": "bin"
+      }
+    ]
+  },
+  "mac": {
+    "icon": "dist",
+    "category": "public.app-category.developer-tools",
+    "target": [
+      "zip"
+    ]
+  },
+  "linux": {
+    "icon": "dist",
+    "target": [
+      "AppImage"
+    ]
+  }
+}

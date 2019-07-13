@@ -1,0 +1,151 @@
+::ng-deep body {
+  user-select: none;
+  overflow: hidden;
+}
+.spacer {
+  flex: auto;
+}
+.app-region-drag {
+  -webkit-app-region: drag;
+  button {
+    -webkit-app-region: no-drag;
+  }
+}
+
+.system-bar {
+  height: 36px;
+  background: #b0bec5;
+  display: flex;
+  flex-direction: row;
+  line-height: 36px;
+  color: #000;
+  .left {
+    -webkit-app-region: drag;
+    flex: auto;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+  .right {
+    flex: none;
+    -webkit-app-region: no-drag;
+    ::ng-deep .mat-icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.system-bar-buttons {
+  a {
+    font-size: 16px;
+    padding: 0 20px;
+    display: inline-block;
+    height: 40px;
+    background: rgba(0,0,0,0);
+    &:hover {
+      background: rgba(0,0,0,0.1);
+    }
+  }
+  a.exit {
+    background: rgba(255,0,0,0);
+    &:hover {
+      background: rgba(255,0,0,1);
+      color: #fff;
+    }
+  }
+  button {
+    border-radius: 0 !important;
+  }
+}
+.container {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  background: #000;
+
+  .title {
+    color: white;
+    margin:0;
+    padding:50px 20px;
+  }
+
+  .top {
+    flex: none;
+  }
+  .list {
+    flex: auto;
+    overflow: auto;
+  }
+}
+.top-in {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  -webkit-app-region: no-drag;
+  padding: 24px;
+  background: rgba(255,255,255,0.1);
+
+
+  > mat-button-toggle {
+    margin-top: .25em;
+    margin-bottom: .25em;
+  }
+
+  > mat-form-field {
+    width: 100px;
+  }
+
+  > * {
+    flex: none;
+    margin-right: 1em;
+  }
+
+  > .targetDir {
+    flex: auto;
+  }
+}
+
+.task-progress {
+  display: flex;
+  flex-direction: row;
+  height: 5px;
+  width: 100%;
+  .task-progress-item {
+    height: 5px;
+    flex: 1;
+    &.complete {
+      background: #C2185B;
+    }
+  }
+
+  &.task-progress-absolute {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    .task-progress-item {
+      height: 100%;
+      &.complete {
+        background: rgba(255,255,255,0.2);
+      }
+    }
+  }
+
+}
+
+.list-progress {
+  position: relative;
+
+  mat-list-item {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+::ng-deep .mat-form-field-wrapper{
+  padding-bottom: 0 !important;
+}
