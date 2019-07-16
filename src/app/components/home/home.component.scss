@@ -20,10 +20,16 @@
   line-height: 36px;
   color: #000;
   .left {
+    flex: auto;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+  .tac {
     -webkit-app-region: drag;
     flex: auto;
     padding: 0 16px;
     font-size: 12px;
+    text-align: center;
   }
   .right {
     flex: none;
@@ -148,4 +154,8 @@
 
 ::ng-deep .mat-form-field-wrapper{
   padding-bottom: 0 !important;
+}
+
+.example-tooltip-red {
+  background: #b71c1c;
 }

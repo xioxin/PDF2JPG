@@ -16,12 +16,14 @@ function createWindow() {
         width: 800,
         height: 600,
         minWidth: 800,
+        minHeight: 600,
         webPreferences: {
             nodeIntegration: true,
         },
-        titleBarStyle: 'hidden',
+        titleBarStyle: 'hiddenInset',
         backgroundColor: '#000',
-        frame: false
+        frame: false,
+        icon: __dirname + "/favicon.png",
     });
     if (serve) {
         require('electron-reload')(__dirname, {
@@ -67,6 +69,9 @@ try {
             createWindow();
         }
     });
+    if (process.platform === 'darwin') {
+        electron_1.app.dock.setIcon(__dirname + "/favicon.1024x1024.png");
+    }
 }
 catch (e) {
     // Catch Error

@@ -14,7 +14,7 @@
             <!--</button>-->
         <!--</mat-toolbar-row>-->
     <!--</mat-toolbar>-->
-  <div class="system-bar">
+  <div *ngIf="platform !== 'darwin'" class="system-bar">
     <div class="left">
         PDF 转 JPG
     </div>
@@ -25,10 +25,13 @@
         <button (click)="exit()" mat-button color="warn">✕</button>
     </div>
   </div>
+  <div class="system-bar" style="-webkit-app-region: drag;" *ngIf="platform === 'darwin'">
+    <div class="tac">PDF 转 JPG</div>
+  </div>
   <div class="top">
 
     <div class="top-in">
-      <mat-button-toggle (click)="addFiles()">
+      <mat-button-toggle [disabled]="!binPath" (click)="addFiles()">
         选择文件
       </mat-button-toggle>
       <mat-form-field appearance="outline">
@@ -69,7 +72,13 @@
     <mat-list>
       <div class="list-progress" *ngFor="let file of fileList">
         <mat-list-item style="position: relative;" (click)="show()" >
-          <mat-icon mat-list-icon>{{['remove', 'repeat', 'check'][file.status]}}</mat-icon>
+          <mat-icon mat-list-icon *ngIf="file.status >= 0">{{['remove', 'repeat', 'check'][file.status]}}</mat-icon>
+          <mat-icon mat-list-icon *ngIf="file.status == -1"
+                    [matTooltip]="file.log"
+                    matTooltipClass="example-tooltip-red"
+          >error_outline</mat-icon>
+
+
           <h3 matLine> <span>{{file.name}}</span> <span style="float: right;"> 共{{file.pages}}页 </span></h3>
         </mat-list-item>
         <div class="task-progress task-progress-absolute">

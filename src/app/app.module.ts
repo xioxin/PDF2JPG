@@ -22,12 +22,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatButtonModule,
   MatButtonToggleModule,
-  MatCardModule,
+  MatCardModule, MatDialogModule,
   MatFormFieldModule, MatIconModule, MatInputModule,
   MatListModule,
-  MatProgressBarModule, MatToolbarModule
+  MatProgressBarModule, MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 import {ScrollingModule} from '@angular/cdk/scrolling';
+import { NotFoundGsComponent } from './components/not-found-gs/not-found-gs.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -38,7 +39,8 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     HomeComponent,
-    WebviewDirective
+    WebviewDirective,
+    NotFoundGsComponent
   ],
   imports: [
     BrowserModule,
@@ -63,8 +65,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatInputModule,
     MatToolbarModule,
     MatIconModule,
+    MatDialogModule,
+    MatTooltipModule
   ],
   providers: [ElectronService],
+  entryComponents: [NotFoundGsComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

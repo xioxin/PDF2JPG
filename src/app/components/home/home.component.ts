@@ -1,9 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import {ElectronService} from '../../providers/electron.service';
 import { default as PQueue } from 'p-queue';
-import {MatIconRegistry, MatListIconCssMatStyler} from '@angular/material';
+import {MatDialog, MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
-import {AppConfig} from '../../../environments/environment';
+import {NotFoundGsComponent} from '../not-found-gs/not-found-gs.component';
+import {app} from 'electron';
 
 interface PdfTask {
   path: string;
@@ -32,35 +33,22 @@ export class HomeComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
     private matIcon: MatIconRegistry,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    public dialog: MatDialog
   ) {
 
-    console.log('AppConfig.production', AppConfig.production);
     console.log('__dirname', __dirname);
     console.log('__filename', __filename);
     console.log('app.getAppPath()', this.es.remote.app.getAppPath());
 
-
-    // const {BrowserWindow} = this.es.remote.require('electron');
-    // this.browserWindow = new BrowserWindow();
-
     const os = this.es.remote.require('os');
-    console.log(os);
     this.cpuSize = os.cpus().length || 1;
     this.concurrencyChange(this.cpuSize);
     this.platform = os.platform();
-    const path = this.es.remote.require('path');
-    if (this.platform === 'win32') {
-      const x = os.arch() === 'x64' ? '64' : '32';
-      console.log('arct', x);
-      if (AppConfig.production) {
-        this.binPath = path.join(path.dirname(this.es.remote.app.getAppPath()), 'bin', 'win', `gswin${x}c.exe`);
-      } else {
-        this.binPath = path.join(this.es.remote.app.getAppPath(), 'src', 'bin', 'win', `gswin${x}c.exe`);
-      }
-      console.log('this.binPath ', this.binPath );
-    }
 
+    this.getBinPath().then(v => {
+      this.cdr.markForCheck();
+    });
   }
 
   browserWindow: any;
@@ -70,7 +58,7 @@ export class HomeComponent implements OnInit {
 
 
   cpuSize = 1;
-  binPath = 'gs';
+  binPath = '';
   platform = '';
   fileListPath: string[] = [];
   fileList: PdfTask[] = [];
@@ -106,6 +94,60 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
 
   }
+
+  async getBinPath() {
+
+    const os = this.es.remote.require('os');
+    const possibleGS: string[] = [
+      '/usr/local/bin/gs',
+      '/usr/bin/gs'
+    ];
+
+    const access = (accessPath: string): Promise<boolean> => {
+      return new Promise(async (resolve) => {
+        this.es.fs.access(accessPath, (err) => {
+          if (err) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+      });
+    };
+
+    const path = this.es.remote.require('path');
+    if (this.platform === 'win32') {
+      const x = os.arch() === 'x64' ? '64' : '32';
+      if (this.es.remote.app.isPackaged) {
+        this.binPath = path.join(path.dirname(this.es.remote.app.getAppPath()), 'bin', 'win', `gswin${x}c.exe`);
+      } else {
+        this.binPath = path.join(this.es.remote.app.getAppPath(), 'src', 'bin', 'win', `gswin${x}c.exe`);
+      }
+    } else {
+
+      for (const gs of possibleGS) {
+        if (await access(gs)) {
+          this.binPath = gs;
+          continue;
+        }
+      }
+      if (!this.binPath) {
+
+        const dialogRef = this.dialog.open(NotFoundGsComponent, {
+          width: '250px',
+          data: {}
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.log('The dialog was closed', result);
+        });
+
+      }
+    }
+
+
+  }
+
   addFiles() {
     const { dialog } = this.es.remote.require('electron');
     const path = this.es.remote.require('path');
@@ -113,7 +155,13 @@ export class HomeComponent implements OnInit {
 
     console.log('path', path);
     // tslint:disable-next-line:max-line-length
-    this.fileListPath = (dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }) || []).filter(v => path.extname(v).toLowerCase() === '.pdf');
+    this.fileListPath = (dialog.showOpenDialog({
+      filters: [
+        { name: 'PDF', extensions: ['pdf'] },
+      ],
+      // browserWindow: this.es.remote.getCurrentWindow(),
+      properties: ['openFile', 'multiSelections'],
+    }) || []).filter(v => path.extname(v).toLowerCase() === '.pdf');
     if (this.fileListPath[0]) {
       this.zone.run(() => {
         this.targetDir = path.dirname(this.fileListPath[0]) + path.sep + 'image';
@@ -160,13 +208,11 @@ export class HomeComponent implements OnInit {
     const iconv = this.es.remote.require('iconv-lite');
     const {sh} = this.es.remote.require('puka');
     task.status = 1;
-
-    this.queue.size;
-
     const el: HTMLElement = this.list.nativeElement;
 
-    el.scrollTop = ((this.fileList.length - this.queue.size) * 56) - el.offsetHeight;
-
+    if (this.queue) {
+      el.scrollTop = ((this.fileList.length - this.queue.size) * 56) - el.offsetHeight;
+    }
 
     return new Promise(async (rootResolve, rootReject) => {
       await new Promise(async (resolve) => {
@@ -254,13 +300,12 @@ export class HomeComponent implements OnInit {
           this.cdr.markForCheck();
         });
 
-
-        task.status = code ? -1 : 2;
+        task.status = code === 0 ? 2 : -1;
         console.log('child process eixt ,exit:' + code);
         this.cdr.markForCheck();
         rootResolve();
 
-        if (this.execSet.size === 0) {
+        if (this.execSet.size === 0 && this.queue.size === 0) {
           this.zone.run(() => {
             this.queue = undefined;
             this.done();
@@ -288,6 +333,7 @@ export class HomeComponent implements OnInit {
   }
 
   start() {
+
     this.queue = new PQueue({concurrency: this.concurrency});
     this.queue.onIdle().then(v => {
       console.log('onIdle');
@@ -296,6 +342,12 @@ export class HomeComponent implements OnInit {
       console.log('onEmpty');
     });
     this.fileList.forEach(v => {
+      if (v.status >= 2) { return; }
+      v.progress.forEach(p => {
+        p.complete = false;
+        p.existence = false;
+        p.inspection = false;
+      });
       this.queue.add(() => this.gsGo(v));
     });
   }
@@ -311,13 +363,13 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  getProgress(){
+  getProgress() {
     let count = 0;
     let complete = 0;
 
     this.fileList.forEach(v => {
       count += v.pages;
-      complete += v.progress.filter(v => v.complete).length;
+      complete += v.progress.filter(v2 => v2.complete).length;
     });
 
     return complete / count;
