@@ -21,9 +21,10 @@ function createWindow() {
             nodeIntegration: true,
         },
         titleBarStyle: 'hiddenInset',
-        backgroundColor: '#000',
+        backgroundColor: '#00000000',
         frame: false,
         icon: __dirname + "/favicon.png",
+        vibrancy: 'ultra-dark',
     });
     if (serve) {
         require('electron-reload')(__dirname, {

@@ -1,8 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import {ElectronService} from '../../providers/electron.service';
 import { default as PQueue } from 'p-queue';
-import {MatDialog, MatIconRegistry} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
+import {MatDialog} from '@angular/material';
 import {NotFoundGsComponent} from '../not-found-gs/not-found-gs.component';
 import {app} from 'electron';
 
@@ -32,8 +31,6 @@ export class HomeComponent implements OnInit {
     private es: ElectronService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private matIcon: MatIconRegistry,
-    private sanitizer: DomSanitizer,
     public dialog: MatDialog
   ) {
 
@@ -49,6 +46,20 @@ export class HomeComponent implements OnInit {
     this.getBinPath().then(v => {
       this.cdr.markForCheck();
     });
+
+    const win = this.es.remote.getCurrentWindow();
+
+    win.setVibrancy('ultra-dark');
+
+    const bounds = win.getBounds();
+    win.setBounds({
+      ...bounds,
+      width: bounds.width + 1
+    });
+    win.setBounds({
+      ...bounds
+    });
+
   }
 
   browserWindow: any;

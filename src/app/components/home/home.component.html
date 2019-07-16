@@ -25,15 +25,15 @@
         <button (click)="exit()" mat-button color="warn">✕</button>
     </div>
   </div>
-  <div class="system-bar" style="-webkit-app-region: drag;" *ngIf="platform === 'darwin'">
+  <div class="system-bar mac" style="-webkit-app-region: drag;" *ngIf="platform === 'darwin'">
     <div class="tac">PDF 转 JPG</div>
   </div>
   <div class="top">
 
     <div class="top-in">
-      <mat-button-toggle [disabled]="!binPath" (click)="addFiles()">
+      <button mat-stroked-button [disabled]="!binPath" (click)="addFiles()">
         选择文件
-      </mat-button-toggle>
+      </button>
       <mat-form-field appearance="outline">
         <mat-label>DPI</mat-label>
         <input [(ngModel)]="dpi" type="number" matInput placeholder="DPI">
@@ -54,12 +54,12 @@
         <input [(ngModel)]="targetDir" readonly matInput placeholder="输出目录">
       </mat-form-field>
 
-      <mat-button-toggle [disabled]="execSet.size != 0" *ngIf="!queue" (click)="start()">
+      <button mat-stroked-button [disabled]="execSet.size != 0" *ngIf="!queue" (click)="start()">
         开始转换
-      </mat-button-toggle>
-    <mat-button-toggle *ngIf="queue" (click)="stop()">
-        停止
-    </mat-button-toggle>
+      </button>
+      <button mat-stroked-button color="warn"  *ngIf="queue" (click)="stop()">
+          停止
+      </button>
     </div>
 
   </div>

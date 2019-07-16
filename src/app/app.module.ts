@@ -66,7 +66,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatToolbarModule,
     MatIconModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   providers: [ElectronService],
   entryComponents: [NotFoundGsComponent],
